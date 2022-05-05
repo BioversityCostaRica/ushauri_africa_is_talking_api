@@ -4,7 +4,6 @@ import os
 import uuid
 from datetime import datetime, timedelta
 from urllib.request import urlretrieve
-import africastalking
 from pyramid.response import Response, FileResponse
 
 from ushauri.processes import (
@@ -29,15 +28,6 @@ def xml_response(resp):
     headers = [("Content-Type", "text/xml; charset=utf-8")]
     resp = Response(body=str(resp), headerlist=headers)
     return resp
-
-
-def send_reply(request, number, audio_id, question_id):
-    user_name = request.registry.settings["africastalking.username"]
-    api_key = request.registry.settings["africastalking.apikey"]
-    africastalking.initialize(user_name, api_key)
-    voice = africastalking.Voice
-    call_from = request.registry.settings["africastalking.number"]
-    voice.call(call_from, number, request.route_url("sendreply", audioid=audio_id))
 
 
 def ivr_send_view(request):

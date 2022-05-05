@@ -1,5 +1,6 @@
 import ushauri.plugins as plugins
 import ushauri.plugins.utilities as u
+import africastalking
 from .views import (
     ivr_get_view,
     ivr_post_view,
@@ -13,6 +14,7 @@ from .views import (
 
 class AfricaIsTalkingAPI(plugins.SingletonPlugin):
     plugins.implements(plugins.IRoutes)
+    plugins.implements(plugins.IIVR)
 
     def before_mapping(self, config):
         # We don't add any routes before the host application
@@ -36,3 +38,11 @@ class AfricaIsTalkingAPI(plugins.SingletonPlugin):
         ]
 
         return custom_map
+
+    def send_reply(self, request, number, audio_id, question_id):
+        user_name = request.registry.settings["africastalking.username"]
+        api_key = request.registry.settings["africastalking.apikey"]
+        africastalking.initialize(user_name, api_key)
+        voice = africastalking.Voice
+        call_from = request.registry.settings["africastalking.number"]
+        voice.call(call_from, number, request.route_url("sendreply", audioid=audio_id))
